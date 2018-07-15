@@ -288,11 +288,18 @@ esr_index <- which(Table5$ProcedureCodeDescription == "ESR")
 factor_v_leiden_index <- which(Table5$ProcedureCodeDescription == "Factor V Leiden Gene" | labtest$ProcedureCodeDescription == "Factor V Leiden")
 homocystein_index <- which(Table5$ProcedureCodeDescription == "Homocysteine, P")
 
-amt <- strsplit(gsub('[^0-9\\.]'," ","&gt; 4.0")," ")
-amt <- as.numeric(lapply(amt, function(y){y[!y ==""]})[[1]][1])
-sym <- strsplit(gsub("[^[:^punct:]&]|[[:digit:]]", " ", "&gt; 4.0", perl = TRUE)," ")
-sym <- lapply(sym, function(y){y[!y ==""]})[[1]][1]                
 
+amt <- strsplit(gsub('[^0-9\\.]'," ","> 2000.0")," ")
+amt <- as.numeric(lapply(amt, function(y){y[!y ==""]})[[1]][1])
+sym <- strsplit(gsub("[^[:^punct:]<&>]|[[:digit:]]", " ", "< 2000.0", perl = TRUE)," ")
+sym <- lapply(sym, function(y){y[!y ==""]})[[1]][1]
+if (is.na(amt) | is.na(sym)) {next}
+
+if (sym == "ng/mL") {
+  amt <- amt/1000
+  sym <- "ug/mL"}
+if (sym==">" | sym == "&gt") { amt <-  amt + 1}
+if (sym=="<" | sym == "&lt") { amt <-  amt - 1}
 # Is it possible that there is case number that is in procedure but not in ds_diag? Yes #haha = match(unique(procedure$CaseIdentificationNumber),unique(Table2$CaseIdentificationNumber))
 # Only 937 out of 1891 NRICs has procedure data available,
 # Out of 937 NRICs, only 188 NRICs truely has 281 procedure codes available, what do the other NRIC data contain?
