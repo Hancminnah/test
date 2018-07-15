@@ -314,3 +314,176 @@ if (sym=="<" | sym == "&lt") { amt <-  amt - 1}
 
 # Case IDs for prescribedmedication > dsbrief> dsdiag > dsnew
 # NRIC for dsnew < prescribedmedication < dsbrief = dsdiag
+
+
+#OrderFrequencyCode     OrderFrequencyDescription
+#1:                0                 EVERY MORNING
+#2:                  D                         DAILY
+#3:
+#4:                  1                   EVERY NIGHT
+#5:                  X                4 TIMES A WEEK
+#6:                  W                3 TIMES A WEEK
+#7:                  A             ON ALTERNATE DAYS
+#8:                  V                2 TIMES A WEEK
+#9:                  Y                5 TIMES A WEEK
+#10:                  Z                6 TIMES A WEEK
+#11:                  U                   ONCE WEEKLY
+#12:                  9                 EVERY EVENING
+#13:             OM1357 EVERY MORNING MON,WED,FRI,SUN
+#14:              OM246   EVERY MORNING TUE,THURS,SAT
+#15:                  I                   IMMEDIATELY
+#16:                  2                 2 TIMES A DAY
+#17:                 DM                             0
+#18:                 PD                 BEFORE DINNER
+#19:                 OT                        OTHERS
+
+# Once a day: EVERY MORNING, DAILY, EVERY NIGHT, EVERY EVENING, BEFORE DINNER [0, D, 1, 9, PD] ==> 7 times a week
+# Twice a day: 2 TIMES A DAY [2] ==> 14 times a week
+# ONCE WEEKLY    ==> 1 time a week [U]
+# 2 TIMES A WEEK ==> 2 times a week [V]
+# 3 TIMES A WEEK ==> 3 times a week [W]
+# 4 TIMES A WEEK ==> 4 times a week [X]
+# 5 TIMES A WEEK ==> 5 times a week [Y]
+# 6 TIMES A WEEK ==> 6 times a week [Z]
+# ON ALTERNATE DAYS ==> 3 times a week (Assuming tue, thur, sat) [A]
+# EVERY MORNING MON,WED,FRI,SUN ==> 4 times a week [OM1357]
+# EVERY MORNING TUE,THURS,SAT ==> 3 times a week [OM246]
+
+#OrderDurationCode OrderDurationCodeDescription
+#1:                M1                      1 MONTH
+#2:                10                      10 DAYS
+#3:                W1                       1 WEEK
+#4:                W2                      2 WEEKS
+#5:                M2                     2 MONTHS
+#6:                W6                      6 WEEKS
+#7:                M3                     3 MONTHS
+#8:                 1                        1 DAY
+#9:                 9                       9 DAYS
+#10:                 8                       8 DAYS
+#11:                 3                       3 DAYS
+#12:                 7                       7 DAYS
+#13:                 2                       2 DAYS
+#14:
+#15:                 4                       4 DAYS
+#16:                W3                      3 WEEKS
+#17:                X0                     10 WEEKS
+#18:                W4                      4 WEEKS
+#19:                12                      12 DAYS
+#20:                 -
+#21:                 6                       6 DAYS
+#22:                 5                       5 DAYS
+#23:                M4                     4 MONTHS
+#24:                W5                      5 WEEKS
+#25:                W8                      8 WEEKS
+#26:                11                      11 DAYS
+#27:                M6                     6 MONTHS
+#28:                M5                     5 MONTHS
+#29:                14                      14 DAYS
+#30:                X6                     16 WEEKS
+#31:                15                      15 DAYS
+#32:     EVERY MORNING                           W4
+#33:     EVERY MORNING                           M1
+
+# 1 DAY, 2 DAYS, 3 DAYS, 4 DAYS, 5 DAYS, 6 DAYS, 7 DAYS, 8 DAYS, 9 DAYS, 11 DAYS, 12 DAYS, 14 DAYS, 15 DAYS [1,2,3,4,5,6,7,8,9,11,12,14,15]
+# 1 WEEK, 2 WEEKS, 3 WEEKS, 4 WEEKS, 5 WEEKS, 6 WEEKS, 8 WEEKS, 10 WEEKS, 16 WEEKS [W1, W2, W3, W4, W5, W6, W8, X0, X6]
+# 1 MONTH, 2 MONTHS, 3 MONTHS, 4 MONTHS, 5 MONTHS, 6 MONTHS [M1, M2, M3, M4, M5, M6]
+
+# Need to convert Frequency into similar format in terms of how many times a day
+
+
+D-Dimer Levels
+unique(Table5[dimer_index,]$FindingAmount)
+[1] "3.4"      "2"        "3.9"      "3.1"      "&gt; 4.0" "2.4"
+[7] "3.2"      "311.4"    "> 2000.0" "1.5"      "> 4.0"    "3.8"
+[13] "2.1"      "1.7"      "1.6"      "0.9"      "2.2"      "2.6"
+[19] "1.9"      "0.7"      "0.8"      "&lt; 0.5" "1"        "3.5"
+[25] "2.8"      "2.5"      "3"        "1.1"      "1.4"      "1.3"
+[31] "1.2"      "2.7"      "3.6"
+> unique(Table5[dimer_index,]$FindingAmountUnitCode)
+[1] "ug/mL" "ng/mL"
+
+Albumin Levels
+unique(Table5[albumin_index,]$FindingAmount)
+[1] "34"  "38"  "35"  "42"  "41"  "39"  "44"  "37"  "36"  "28"  "22"  "23"
+[13] "21"  "29"  "25"  "26"  "32"  "24"  "27"  "30"  "12"  "31"  "40"  "33"
+[25] "20"  "17"  "43"  "18"  "19"  "15"  "47"  "60"  "45"  "46"  "48"  "14"
+[37] "16"  "INV" "50"  "52"  "13"  "51"  "49"
+unique(Table5[albumin_index,]$FindingAmountUnitCode)
+[1] "g/L" ""
+
+Antithrombin levels
+> unique(Table5[antithrombin3_index,]$FindingAmountUnitCode)
+[1] "%"
+> unique(Table5[antithrombin3_index,]$FindingAmount)
+[1] "102" "86"  "104" "84"  "85"  "99"  "103" "93"  "92"  "87"  "91"  "100"
+[13] ""    "109" "98"  "97"  "94"  "72"  "116" "88"  "111" "61"  "115" "96"
+
+
+Protein C Levels
+> unique(Table5[protein_c_index,]$FindingAmount)
+[1] "47"       "118"      "&gt; 150" "78"       "42"       "25"
+[7] "93"       "107"      "79"       "82"       "81"       "122"
+[13] "95"       "124"      "117"      ""         "88"       "111"
+[19] "92"       "134"      "56"       "80"       "57"       "132"
+[25] "146"      "50"       "74"       "87"       "58"
+> unique(Table5[protein_c_index,]$FindingAmountUnitCode)
+[1] "%"
+
+Protein S Levels
+> unique(Table5[protein_s_index,]$FindingAmount)
+[1] "42"  "122" "997" "58"  "36"  "43"  "57"  "76"  "72"  "92"  "84"  "65"
+[13] "87"  "110" ""    "102" "75"  "129" "91"  "61"  "93"  "86"  "28"  "71"
+[25] "13"
+> unique(Table5[protein_s_index,]$FindingAmountUnitCode)
+[1] "%"
+
+C Reactive Protein Levels
+> unique(Table5[c_reactive_proc_index,]$FindingAmountUnitCode)
+[1] "mg/L" ""
+
+ProThrombin Levels
+> unique(Table5[prothrombin_index,]$FindingAmountUnitCode)
+[1] ""
+> unique(Table5[prothrombin_index,]$FindingAmount)
+[1] "."      "Normal"
+
+ESR Levels
+> unique(Table5[esr_index,]$FindingAmountUnitCode)
+[1] "mm/hr"
+> unique(Table5[esr_index,]$FindingAmount)
+[1] "79"       "45"       "103"      "116"      "47"       "80"
+[7] "99"       "73"       "72"       "58"       "54"       "44"
+[13] "82"       "74"       "59"       "49"       "81"       "119"
+[19] "50"       "15"       "48"       "18"       "115"      "124"
+[25] "125"      "126"      "92"       "98"       "106"      "32"
+[31] "69"       "62"       "39"       "29"       "56"       "31"
+[37] "65"       "77"       "101"      "97"       "22"       "36"
+[43] "53"       "43"       "19"       "23"       "52"       "107"
+[49] "94"       "78"       "108"      "121"      "10"       "8"
+[55] "51"       "120"      "136"      "64"       "109"      "57"
+[61] "104"      "63"       "88"       "100"      "90"       "68"
+[67] "83"       "93"       "41"       "42"       "70"       "37"
+[73] "33"       "16"       "85"       "25"       "91"       "14"
+[79] "11"       "17"       "38"       "6"        "9"        "24"
+[85] "4"        "7"        "1"        "84"       "13"       "5"
+[91] "3"        "2"        "132"      "123"      "61"       "87"
+[97] "86"       "75"       "89"       "102"      "114"      "110"
+[103] "112"      "105"      "131"      "95"       "67"       "76"
+[109] "55"       "40"       "128"      "117"      "96"       "34"
+[115] "66"       "26"       "60"       "30"       "27"       "122"
+[121] "&gt; 145" "46"       "35"       "129"      "71"
+
+Factor V Leiden Levels
+> unique(Table5[factor_v_leiden_index,]$FindingAmount)
+[1] "." NA
+> unique(Table5[factor_v_leiden_index,]$FindingAmountUnitCode)
+[1] "" NA
+
+Homocystein Levels
+> unique(Table5[homocystein_index,]$FindingAmount)
+[1] "21.2" "26.9" "14.2" "17.6" "11.5" "10.1" "9.4"  "8.8"  "12.6" "14"
+[11] "8.1"  "10.9" "9.5"  "35.5" "15.9" "21.3" "26.7" "18.3" "20.8" "12.1"
+[21] "14.5" "9"    "11.8" "19"   "7.4"  "26.5" "5.6"  "4.9"  "7.9"  "8.2"
+[31] "11.3" "15"
+> unique(Table5[homocystein_index,]$FindingAmountUnitCode)
+[1] "umol/L"
