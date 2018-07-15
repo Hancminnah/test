@@ -288,18 +288,10 @@ esr_index <- which(Table5$ProcedureCodeDescription == "ESR")
 factor_v_leiden_index <- which(Table5$ProcedureCodeDescription == "Factor V Leiden Gene" | labtest$ProcedureCodeDescription == "Factor V Leiden")
 homocystein_index <- which(Table5$ProcedureCodeDescription == "Homocysteine, P")
 
-
-> unique(Table5[dimer_index,]$FindingAmount)
-[1] "3.4"      "2"        "3.9"      "3.1"      "&gt; 4.0" "2.4"
-[7] "3.2"      "311.4"    "> 2000.0" "1.5"      "> 4.0"    "3.8"
-[13] "2.1"      "1.7"      "1.6"      "0.9"      "2.2"      "2.6"
-[19] "1.9"      "0.7"      "0.8"      "&lt; 0.5" "1"        "3.5"
-[25] "2.8"      "2.5"      "3"        "1.1"      "1.4"      "1.3"
-[31] "1.2"      "2.7"      "3.6"
-> which(Table5[dimer_index,]$FindingAmountUnitCode=="ng/mL")
-[1] 10 12 13 15
-> Table5[dimer_index[c(10,12,13,15)],]$FindingAmount
-[1] "311.4"    "> 2000.0" "311.4"    "> 2000.0"
+amt <- strsplit(gsub('[^0-9\\.]'," ","&gt; 4.0")," ")
+amt <- as.numeric(lapply(amt, function(y){y[!y ==""]})[[1]][1])
+sym <- strsplit(gsub("[^[:^punct:]&]|[[:digit:]]", " ", "&gt; 4.0", perl = TRUE)," ")
+sym <- lapply(sym, function(y){y[!y ==""]})[[1]][1]                
 
 # Is it possible that there is case number that is in procedure but not in ds_diag? Yes #haha = match(unique(procedure$CaseIdentificationNumber),unique(Table2$CaseIdentificationNumber))
 # Only 937 out of 1891 NRICs has procedure data available,
