@@ -285,21 +285,42 @@ protein_s_index <- which(Table5$ProcedureCodeDescription == "Protein S Activity"
 c_reactive_proc_index <- which(Table5$ProcedureCodeDescription == "C-Reactive Protein")
 prothrombin_index <- which(Table5$ProcedureCodeDescription == "Prothrombin 20210A G")
 esr_index <- which(Table5$ProcedureCodeDescription == "ESR")
-factor_v_leiden_index <- which(Table5$ProcedureCodeDescription == "Factor V Leiden Gene" | labtest$ProcedureCodeDescription == "Factor V Leiden")
+factor_v_leiden_index <- which(Table5$ProcedureCodeDescription == "Factor V Leiden Gene" | Table5$ProcedureCodeDescription == "Factor V Leiden")
 homocystein_index <- which(Table5$ProcedureCodeDescription == "Homocysteine, P")
 
+Table5$LabSym <- ""
+Table5$LabValue <- ""
+Table5$LabUnit <- ""
 
-amt <- strsplit(gsub('[^0-9\\.]'," ","> 2000.0")," ")
-amt <- as.numeric(lapply(amt, function(y){y[!y ==""]})[[1]][1])
-sym <- strsplit(gsub("[^[:^punct:]<&>]|[[:digit:]]", " ", "< 2000.0", perl = TRUE)," ")
-sym <- lapply(sym, function(y){y[!y ==""]})[[1]][1]
-if (is.na(amt) | is.na(sym)) {next}
+for (k in 1:dim(Table5)[1]) {
+  lab_obs <- Table5[k,]$FindingAmount
+  lab_unit <- Table5[k,]$FindingAmountUnitCode
+  amt <- strsplit(gsub('[^0-9\\.]'," ",lab_obs)," ")
+  amt <- as.numeric(lapply(amt, function(y){y[!y ==""]})[[1]][1])
+  sym <- strsplit(gsub("[^[:^punct:];<&>]|[[:digit:]]", " ", lab_obs, perl = TRUE)," ")
+  sym <- lapply(sym, function(y){y[!y ==""]})[[1]][1]
+  if (is.na(amt) & is.na(sym) & lab_obs == ".") {
+    amt <-"Not Normal"
+    sym <- ""}
+  if (is.na(amt) & is.na(sym) & lab_obs != ".") {next}
+  if (is.na(amt) & sym == "INV") {next}
+  if (is.na(amt) & sym == "Normal") {
+    amt <-"Normal"
+    sym <- ""}
+  if (lab_unit == "ng/mL") {
+    amt <- amt/1000
+    lab_unit <- "ug/mL"}
+  if (is.na(sym)==FALSE) {
+    if (sym==">" | sym == "&gt") { amt <-  amt + 1}
+    if (sym=="<" | sym == "&lt") { amt <-  amt - 1}
+  }
+  Table5[k,]$LabSym <- sym
+  Table5[k,]$LabValue <- amt
+  Table5[k,]$LabUnit <- lab_unit
+}
 
-if (sym == "ng/mL") {
-  amt <- amt/1000
-  sym <- "ug/mL"}
-if (sym==">" | sym == "&gt") { amt <-  amt + 1}
-if (sym=="<" | sym == "&lt") { amt <-  amt - 1}
+
+
 # Is it possible that there is case number that is in procedure but not in ds_diag? Yes #haha = match(unique(procedure$CaseIdentificationNumber),unique(Table2$CaseIdentificationNumber))
 # Only 937 out of 1891 NRICs has procedure data available,
 # Out of 937 NRICs, only 188 NRICs truely has 281 procedure codes available, what do the other NRIC data contain?
@@ -475,9 +496,11 @@ ESR Levels
 
 Factor V Leiden Levels
 > unique(Table5[factor_v_leiden_index,]$FindingAmount)
-[1] "." NA
+[1] "."      "Normal"
+
 > unique(Table5[factor_v_leiden_index,]$FindingAmountUnitCode)
-[1] "" NA
+[1] ""
+
 
 Homocystein Levels
 > unique(Table5[homocystein_index,]$FindingAmount)
