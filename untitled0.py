@@ -5,6 +5,7 @@ Created on Mon Jul 16 16:58:16 2018
 @author: AdminCOOP
 References: http://pbpython.com/pandas-pivot-table-explained.html
           : https://stackoverflow.com/questions/39229005/pivot-table-no-numeric-types-to-aggregate
+          : https://stackoverflow.com/questions/41463763/merge-2-dataframes-with-same-values-in-a-column
 """
 
 import pandas as pd
@@ -16,11 +17,16 @@ tempdata2['LabValue'] = pd.to_numeric(tempdata2['LabValue'])
 tempdata1_pivot = tempdata1.pivot_table(index = 'CaseIdentificationNumber',
                values = 'LabValue',
                columns = 'ProcedureCodeDescription',aggfunc='first') # Note that there can be more than 1 labtest observation values in a case visit. I took the mean here. Zhaojing mentions majority voting or split it up into High, Normal Low.
+tempdata1_pivot = tempdata1_pivot.reset_index()
+
 tempdata2_pivot = tempdata2.pivot_table(index = 'CaseIdentificationNumber',
                values = 'LabValue',
                columns = 'ProcedureCodeDescription',aggfunc='mean') # Note that there can be more than 1 labtest observation values in a case visit. I took the mean here. Zhaojing mentions majority voting or split it up into High, Normal Low.
+tempdata2_pivot = tempdata2_pivot.reset_index()
 
 tempdata1_pivot.to_csv('C:/Users/AdminCOOP/Desktop/temp/pivoted_tablev1.csv')
 tempdata2_pivot.to_csv('C:/Users/AdminCOOP/Desktop/temp/pivoted_tablev2.csv')
 
-dsmed = bmcpiv.merge(cdrugs,on=['DeIdentifiedNRIC'])
+result = pd.merge(tempdata1_pivot, tempdata2_pivot, how='outer')
+
+result.to_csv('C:/Users/AdminCOOP/Desktop/temp/pivoted_table_final.csv')
