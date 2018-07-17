@@ -255,6 +255,8 @@ Table4$Frequency <- as.numeric(Table4$Frequency)
 Table4$DayDuration <- as.numeric(Table4$DayDuration)
 Table4$SED <- Table4$DosageAmount * Table4$Frequency * Table4$DayDuration
 
+# Remove those fields that is NA
+Table4 <- Table4[-which(is.na(Table4$SED)),]
 if (fsave == 1) {
   fwrite(Table4,"C:/Users/mmchan/Desktop/MinMin/GeneralComplication/Preprocessing/codes_to_preprocess_data_for_zhaojing/medication_table.csv")
 }

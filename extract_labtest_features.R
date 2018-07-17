@@ -7,7 +7,7 @@
 library(data.table)
 setwd('/data/volume/MinMin/GeneralComplication/Deidentified_Extracted_Data')
 labtest <- fread('./case_labtest_observation.csv')
-
+medicationorder <- fread('./case_medicationorder_mapped.csv')
 # Maybe good to check if there are other labtest descriptions with the same procedure code
 # Checked. Seems like ProcedureCodeDescription and ProcedureCode is unique to each other (One-to-One mapping)
 dimer_index <- which(labtest$ProcedureCodeDescription == "D-Dimer")

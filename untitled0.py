@@ -6,6 +6,7 @@ Created on Mon Jul 16 16:58:16 2018
 References: http://pbpython.com/pandas-pivot-table-explained.html
           : https://stackoverflow.com/questions/39229005/pivot-table-no-numeric-types-to-aggregate
           : https://stackoverflow.com/questions/41463763/merge-2-dataframes-with-same-values-in-a-column
+          : https://stackoverflow.com/questions/44937462/outer-merging-two-data-frames-in-place-in-pandas
 """
 
 import pandas as pd
@@ -30,3 +31,9 @@ tempdata2_pivot.to_csv('C:/Users/AdminCOOP/Desktop/temp/pivoted_tablev2.csv')
 result = pd.merge(tempdata1_pivot, tempdata2_pivot, how='outer')
 
 result.to_csv('C:/Users/AdminCOOP/Desktop/temp/pivoted_table_final.csv')
+
+medication_table = pd.read_csv('/data/volume/MinMin/GeneralComplication/Preprocessing/temp_folder/medication_table.csv')
+medication_table2 = medication_table[['DeIdentifiedNRIC','CaseIdentificationNumber','DrugName','SED']]
+medication_table2['SED'] = pd.to_numeric(medication_table2['SED'])
+medication_table_pivot = medication_table2.pivot_table(index = ['DeIdentifiedNRIC','CaseIdentificationNumber'], values = 'SED', columns = 'DrugName',aggfunc='mean',fill_value=0)
+
